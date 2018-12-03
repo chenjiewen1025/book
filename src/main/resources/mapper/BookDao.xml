@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 设置为IUserDao接口方法提供sql语句配置 -->
+<mapper namespace="com.chatRobot.dao.BookDao">
+
+    <select id="selectBookById" resultType="com.chatRobot.model.Book" >
+        SELECT * FROM book WHERE book_id = #{0}
+    </select>
+    <update id="borrow" parameterType="int">
+        update book set usable_num= usable_num-1 where book_id = #{0}
+    </update>
+    <select id="usableNum" parameterType="int" resultType="int">
+        select usable_num from book where book_id = #{0}
+    </select>
+    <select id="selectBook" resultType="com.chatRobot.model.Book" >
+        select * from book where 1=1
+        <if test="book_name != null and book_name != ''">
+    and book_name like concat(concat('%',#{book_name}),'%')
+        </if>
+        <if test="actor_name != null and actor_name != ''">
+            and book_actor like concat(concat('%',#{actor_name}),'%')
+        </if>
+    </select>
+
+
+
+</mapper>

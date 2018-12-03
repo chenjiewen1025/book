@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 设置为IUserDao接口方法提供sql语句配置 -->
+<mapper namespace="com.chatRobot.dao.MyOrderDao">
+
+    <insert id="insertOrder" parameterType="com.chatRobot.model.MyOrder">
+         INSERT INTO myorder values
+                    (null ,#{user_id},#{book_id},#{time_out} ,null,0 ,#{last_time})
+    </insert>
+    <select id="borrowCount"  resultType="java.lang.Integer">
+        select count(*) from myorder where user_id=#{user_id} and order_state=0
+    </select>
+    <select id="bookBorrowExists" resultType="java.lang.Integer">
+select exists (SELECT 1 from myorder where user_id=#{user_id} and book_id=#{book_id} and order_state=0 LIMIT 1)
+
+    </select>
+    <update id="reBorrow" parameterType="int" >
+        UPDATE myorder SET last_time=DATE_ADD(last_time,INTERVAL 30 DAY) WHERE order_id=#{order_id}
+    </update>
+    <select id="selectOrderState" parameterType="int">
+        SELECT order_state from myorder WHERE order_id=#{order_id}
+    </select>
+    <select id="selectAllOrder" resultType="com.chatRobot.model.MyOrder">
+        select * from myorder where user_id = #{user_id}
+    </select>
+    <select id="selectIncompleteOrder" resultType="com.chatRobot.model.MyOrder">
+        select * from myorder where user_id = #{user_id} and order_state=0 or order_state=1
+    </select>
+
+    <select id="selectRecord" resultType="com.chatRobot.model.Record">
+SELECT
+user.name,user.user_id,myorder.book_id,book.book_name,
+myorder.time_out,myorder.time_in,myorder.order_state
+FROM user,myorder,book
+WHERE user.user_id=myorder.user_id and myorder.book_id=book.book_id
+and user.user_id = #{user_id}
+        <if test="book_name != null and book_name != ''">
+            and book.book_name like concat(concat('%',#{book_name}),'%')
+        </if>
+    </select>
+</mapper>
